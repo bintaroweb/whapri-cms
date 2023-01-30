@@ -1,0 +1,204 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Contact;
+use App\Models\Device;
+use App\Models\Message;
+use App\Models\Template;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use DataTables;
+use Illuminate\Support\Facades\DB;
+
+class MessageController extends Controller
+{
+    /**
+     * Create a middleware auth.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        return view('message.index');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function datatable()
+    {
+        $messages = Message::where('user_id', Auth::user()->id)->orderByDesc('created_at')->get();
+        $data= [];
+
+        foreach($messages as $message){
+            $message['date'] = date_format($message->created_at, 'd-m-Y h:i:s');
+
+            if(strlen($message->message) > 150) {
+                $string = substr($message->message, 0, 150).'...';
+                $message['message'] = $string;
+            } else {
+                $message['message'] = $message->message;
+            }
+
+            $contact = Contact::where('id', $message->contact_id)->first();
+            // dd($message->contact_id);
+            // $nama = $contact->phone;
+
+            // echo $contact->name;
+            $message['name'] = $contact->phone . ' (' . $contact->name . ')';
+
+            $message['file'] = $message->file;
+            $message['ack'] = $message->ack;
+
+            $user = User::where('id', $message->user_id)->first();
+            $message['user'] = $user->name;
+
+            $device = Device::where('id', $message->device_id)->first();
+            $message['device'] = $device->name;
+
+
+            $message['time'] = date("Y-m-d H:i:s", $message->timestamp); 
+
+            array_push($data, $message);
+        }
+
+
+        return DataTables::of($data)->make(true);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function autocomplete(Request $request)
+    {
+        $data = Contact::where('user_id', Auth::user()->id)->get();
+        return response()->json($data);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        $devices = Device::where('user_id', Auth::user()->id )->get(); 
+        $templates = Template::where('user_id', Auth::user()->id )->get();        
+        return view('message.create', ['devices' => $devices, 'templates' => $templates]);
+    }
+
+    public function template(Request $request)
+    {
+        $template = Template::where('uuid', $request->uuid)->first();  
+        return response()->json([
+            'success' => true,
+            'template' => $template
+        ]);  
+        
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'message' => 'required',
+            'receiver'  => 'string',
+            'device' => 'required',
+            'message_id' => 'required',
+            'ack' => 'required',
+            'timestamp' => 'required'
+        ]);
+
+        $device = Device::where('uuid', $request['device'])->first();
+
+        $contact = Contact::where('phone', $request['receiver'])
+                            ->where('user_id', Auth::user()->id)
+                            ->first();
+
+        Message::create([
+            'message' => $request['message'],
+            'message_id' => $request['message_id'],
+            'contact_id' => $contact->id,
+            'device_id' => $device->id,
+            'user_id' => Auth::user()->id,
+            'ack' => $request['ack'],
+            'timestamp' => $request['timestamp'],
+        ]);
+
+        return redirect('/messages')->with('success', 'Pesan berhasil ditambah');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function detail(Request $request)
+    {
+        $message = Message::where('uuid', $request->uuid)->first();
+
+        // if($request->ajax()){
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        // }  
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($uuid)
+    {
+        Message::where('uuid', $uuid)->delete();
+        return redirect('/messages')->with('success', 'Pesan berhasil dihapus');
+    }
+}
