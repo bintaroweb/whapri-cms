@@ -16,5 +16,5 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: whapri.my.id
-        username: ${{ secrets.ftp_username }}
-        password: ${{ secrets.ftp_password }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
