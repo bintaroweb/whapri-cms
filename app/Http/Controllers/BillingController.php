@@ -32,7 +32,6 @@ class BillingController extends Controller
     public function datatable()
     {
         $billings = Billing::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->get();
-        // $data = [];
         foreach($billings as $billing){
             $billing['amount'] = 'Rp. ' . number_format($billing['amount'], 0, ',', '.');
             $billing['date'] = date_format($billing->created_at, 'd-m-Y');
@@ -40,7 +39,9 @@ class BillingController extends Controller
             $billing['id'] = $billing['id'];
             if($billing['payment_method'] == 'bank_transfer'){
                 $billing['payment_method'] = 'Bank Transfer';
-            } else if($billing['payment_method'] == 'cstore'){
+            } else if($billing['payment_method'] == 'credit_card'){
+                $billing['payment_method'] = 'Kartu Kredit';
+            }else if($billing['payment_method'] == 'cstore'){
                 $billing['payment_method'] = 'Minimarket';
             } else if($billing['payment_method'] == 'bri_epay'){
                 $billing['payment_method'] = 'BRImo';
@@ -79,9 +80,9 @@ class BillingController extends Controller
         $billing = Billing::where('uuid', $request->uuid)->first();
 
         // Set your Merchant Server Key
-        \Midtrans\Config::$serverKey = 'SB-Mid-server-9Da1lJip_CDlm-9h1qbSox3S';
+        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
         // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
-        \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$isProduction = env('MIDTRANS_PRODUCTION');
         // Set sanitization on (default)
         \Midtrans\Config::$isSanitized = true;
         // Set 3DS transaction for credit card to true

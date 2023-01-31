@@ -7,7 +7,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 <script type="text/javascript"
       src="https://app.sandbox.midtrans.com/snap/snap.js"
-      data-client-key="SB-Mid-client-7nYEkST_YyN1i5kI"></script>
+      data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 
 @endsection
 
