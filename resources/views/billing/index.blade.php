@@ -315,7 +315,7 @@
             "positionClass": "toast-bottom-right",
         }
         toastr.success("Pembayaran berhasil");
-    } else {
+    } else if(payment == 'failed'){
         toastr.options =
         {
             "closeButton" : true,
