@@ -304,6 +304,26 @@
         return true;
     }
 
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const payment = urlParams.get('payment');
+
+    if(payment == 'success'){
+        toastr.options =
+        {
+            "closeButton" : true,
+            "positionClass": "toast-bottom-right",
+        }
+        toastr.success("Pembayaran berhasil");
+    } else {
+        toastr.options =
+        {
+            "closeButton" : true,
+            "positionClass": "toast-bottom-right",
+        }
+        toastr.error("Pembayaran gagal");
+    }
+
     @if(Session::has('success'))
         toastr.options =
         {
