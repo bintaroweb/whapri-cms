@@ -26,4 +26,18 @@ class ApiController extends Controller
             Message::where()
         }
     }
+
+    public function payment_status(Request $request){
+        if($request->status_code == 200){
+            Billing::where('uuid', $request->order_id)
+            ->update([
+                'payment_method' => $request->payment_type, 
+                'status' =>'Paid'
+            ]);
+        } 
+
+        return response()->json([
+            'success' => true
+        ]);       
+    }
 }

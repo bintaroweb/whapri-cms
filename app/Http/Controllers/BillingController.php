@@ -31,12 +31,22 @@ class BillingController extends Controller
      */
     public function datatable()
     {
-        $billings = Billing::where('user_id', Auth::user()->id)->get();
+        $billings = Billing::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->get();
         // $data = [];
         foreach($billings as $billing){
             $billing['amount'] = 'Rp. ' . number_format($billing['amount'], 0, ',', '.');
             $billing['date'] = date_format($billing->created_at, 'd-m-Y');
             $billing['status'] = $billing['status'];
+            $billing['id'] = $billing['id'];
+            if($billing['payment_method'] == 'bank_transfer'){
+                $billing['payment_method'] = 'Bank Transfer';
+            } else if($billing['payment_method'] == 'cstore'){
+                $billing['payment_method'] = 'Minimarket';
+            } else if($billing['payment_method'] == 'bri_epay'){
+                $billing['payment_method'] = 'BRImo';
+            } else if($billing['payment_method'] == 'qris'){
+                $billing['payment_method'] = 'QRIS';
+            }
         }
         return DataTables::of($billings)->make(true);
     }
@@ -95,6 +105,34 @@ class BillingController extends Controller
             'success' => true,
             'token' => $snapToken
         ]);  
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function detail(Request $request)
+    {
+        $billing = Billing::where('uuid', $request->uuid)->where('user_id', Auth::user()->id)->first();
+        $billing['amount'] = 'Rp. ' . number_format($billing['amount'], 0, ',', '.');
+        if($billing['payment_method'] == 'bank_transfer'){
+            $billing['payment_method'] = 'Bank Transfer';
+        } else if($billing['payment_method'] == 'cstore'){
+            $billing['payment_method'] = 'Minimarket';
+        } else if($billing['payment_method'] == 'bri_epay'){
+            $billing['payment_method'] = 'BRImo';
+        } else if($billing['payment_method'] == 'qris'){
+            $billing['payment_method'] = 'QRIS';
+        }
+
+        // if($request->ajax()){
+            return response()->json([
+                'success' => true,
+                'billing' => $billing
+            ]);
+        // }  
     }
 
     /**
@@ -158,8 +196,9 @@ class BillingController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($uuid)
     {
-        //
+        Billing::where('uuid', $uuid)->where('user_id', Auth::user()->id)->delete();
+        return redirect('/billings')->with('success', 'Billing berhasil dihapus');
     }
 }

@@ -51,4 +51,5 @@ Route::resource('templates', '\App\Http\Controllers\TemplateController');
 Route::get('billings/datatable', [\App\Http\Controllers\BillingController::class, 'datatable']);
 Route::get('billings/autocomplete', [\App\Http\Controllers\BillingController::class, 'autocomplete']);
 Route::post('billings/payment', [\App\Http\Controllers\BillingController::class, 'payment']);
+Route::get('billings/detail', [\App\Http\Controllers\BillingController::class, 'detail']);
 Route::resource('billings', '\App\Http\Controllers\BillingController');

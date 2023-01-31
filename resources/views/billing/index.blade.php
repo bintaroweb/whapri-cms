@@ -39,13 +39,13 @@
 
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table billing" id="dataTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
                                 <th>Invoice</th>
                                 <th>Nominal</th>
-                                <th>User</th>
+                                <th>Metode Pembayaran</th>
                                 <th>Status</th>
                                 <th></th>
                             </tr>
@@ -57,7 +57,7 @@
     </div>
 </div>
 
-<!-- Modal View Detail -->
+<!-- Modal Topup-->
 <div class="modal fade" id="modal-popup" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -72,20 +72,90 @@
       </div>
       <div class="modal-footer">
         <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bayar</button> -->
-        <button type="button" class="btn btn-primary" id="confirm-topup" disabled>Lanjut Bayar <i class="fa-solid fa-arrow-right"></i></button>
+        <button type="button" class="btn btn-primary" id="confirm-topup" disabled>Simpan</button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Modal View Detail -->
+<div class="modal fade" id="modal-detail" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Detail Pembayaran</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="payment">
+            <table>
+                <tr>
+                    <td>No Invoice</td>
+                    <td class="px-2">:</td>
+                    <td>#<span id="invoice"></span></td>
+                </tr>
+                <tr>
+                    <td>Waktu Pembayaran</td>
+                    <td class="px-2">:</td>
+                    <td><span id="settlement_time"></span></td>
+                </tr>
+                <tr>
+                    <td>Metode Pembayaran</td>
+                    <td class="px-2">:</td>
+                    <td><span id="payment_method" class="text-capitalize"></span></td>
+                </tr>
+                <tr>
+                    <td>Nominal</td>
+                    <td class="px-2">:</td>
+                    <td><span id="nominal"></span></td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td class="px-2">:</td>
+                    <td><span id="status" class="badge text-bg-success text-capitalize"></span></td>
+                </tr>
+            </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Delete -->
+<div class="modal fade" id="modal-delete" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Konfirmasi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      Apakah kamu ingin menghapus data billing ini?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete">Hapus</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form id="delete-form" action="" method="POST" class="d-none">
+    @method('delete')    
+    @csrf
+</form>
 
 @endsection
 
 @push('scripts')
 <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }} "></script>
 <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-    // dataTables plugin
     $(document).ready(function() {
         $('#dataTable').DataTable( {
             processing: true,
@@ -99,19 +169,31 @@
             ajax: "{{ url('billings/datatable') }}",
             columns: [
                 { data:"date", className:"date"},
-                { "mRender": function ( data, type, row ) {
-                    return '<div>#'+row.id+'';}
+                { "mRender": function ( data, type, row ) 
+                    {
+                        return '#'+ row.id +'';
+                    }
                 },
                 { data:"amount", className:"amount"},
-                { "mRender": function ( data, type, row ) {
-                    return '{{ Auth::user()->name }}';}
+                { data:"payment_method", className:"payment_method text-capitalize"},
+                { "mRender": function ( data, type, row ) 
+                    {
+                        if(row.status == 'paid'){
+                            return '<span class="badge text-bg-success text-capitalize">'+ row.status +'</span>';
+                        } else {
+                            return '<span class="badge text-bg-warning text-capitalize">'+ row.status +'</span>';
+                        }
+                        
+                    }
                 },
-                { "mRender": function ( data, type, row ) {
-                    return '<span class="badge text-bg-secondary">'+ row.status +'</span>';}
-                },
-                // { data:"status", className:"status"},
-                { "mRender": function ( data, type, row ) {
-                    return '<div class="d-md-flex justify-content-md-end"><a href="#" class="btn btn-primary btn-sm pay mx-2" data-uuid="'+row.uuid+'">Bayar</a> <a href="#" class="btn btn-danger btn-sm delete" data-uuid="'+row.uuid+'"><i class="fa-solid fa-trash"></i></a></div>';}
+                { "mRender": function ( data, type, row ) 
+                    {
+                        if(row.status == 'paid'){
+                            return '<div class="d-md-flex justify-content-md-end"><a href="#" class="btn btn-secondary detail btn-sm" data-uuid="'+row.uuid+'" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"><i class="fa-solid fa-eye"></i></a></div>';
+                        } else {
+                            return '<div class="d-md-flex justify-content-md-end"><a href="#" class="btn btn-primary btn-sm pay mx-2" data-uuid="'+row.uuid+'" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Bayar</a> <a href="#" class="btn btn-danger btn-sm delete" data-uuid="'+row.uuid+'" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"><i class="fa-solid fa-trash"></i></a></div>';
+                        } 
+                    }
                 }
             ], 
             language: {
@@ -146,6 +228,13 @@
                 success: function(result) {
                     if(result.success){
                         $('#modal-popup').modal('hide');
+                        toastr.options = {
+                            "closeButton" : true,
+                            "positionClass": "toast-bottom-right",
+                        }
+                        toastr.success("Invoice topup berhasil dibuat");
+                        $('#dataTable').DataTable().clear().draw();
+                        $('#amount').val('');
                     }
                 }
             })
@@ -169,9 +258,40 @@
                 }
             })
         })
+
+        $( document ).on("click", ".detail", function(e){
+            e.preventDefault();
+            var uuid = $(this).data('uuid');
+            $.ajax({
+                type: 'GET',
+                url: "{{ url('/billings/detail') }}",
+                data: { 
+                    uuid: uuid, 
+                },
+                success: function(result) { 
+                    console.log(result);
+                    $('#invoice').text(result.billing.id)
+                    $('#payment_method').text(result.billing.payment_method)
+                    $('#settlement_time').text(result.billing.settlement_time)
+                    $('#status').text(result.billing.status)
+                    $('#nominal').text(result.billing.amount)
+                    $('#modal-detail').modal('show');
+                }
+            })
+            // $('#modal-detail').modal('show');
+        })
+
+        $( document ).on("click", ".delete", function(e){
+            e.preventDefault();
+            var uuid = $(this).data('uuid');
+            $('#delete-form').attr('action', '{{ url("/billings") }}/'+uuid+'');
+            $('#modal-delete').modal('show');
+        })
+
+        $('#confirm-delete').click(function(){
+            $('#delete-form').submit();
+        })
     });
-
-
 
     function onlyNumberKey(evt) {
         // Only ASCII character in that range allowed
@@ -183,50 +303,16 @@
         }
         return true;
     }
+
+    @if(Session::has('success'))
+        toastr.options =
+        {
+            "closeButton" : true,
+            "positionClass": "toast-bottom-right",
+        }
+        toastr.success("{{ session('success') }}");
+    @endif
     
-</script>
-
-<script>
-    $( document ).on("click", ".delete", function(e){
-        e.preventDefault();
-        var uuid = $(this).data('uuid');
-        $('#delete-form').attr('action', '{{ env("APP_URL") }}/messages/'+uuid+'');
-        $('#modal-delete').modal('show');
-    })
-
-    $('#confirm-delete').click(function(){
-        // document.getElementById('logout-form').submit();
-        $('#delete-form').submit();
-    })
-
-    $( document ).on("click", ".detail", function(e){
-        e.preventDefault();
-        var uuid = $(this).data('uuid');
-        $.ajax({
-            type: 'GET',
-            url: "{{ env('APP_URL') }}/messages/detail",
-            data: { 
-                uuid: uuid, 
-            },
-            success: function(result) { 
-                console.log(result);
-                $('.pesan').text(result.message.message)
-                // $('.receiver').text(result.message.date)
-                $('#modal-detail').modal('show');
-            }
-        })
-        // $('#modal-detail').modal('show');
-    })
-  @if(Session::has('success'))
-    toastr.options =
-    {
-        "closeButton" : true,
-        "positionClass": "toast-bottom-right",
-    }
-  	toastr.success("{{ session('success') }}");
-  @endif
-
-  
 </script>
 
 @endpush

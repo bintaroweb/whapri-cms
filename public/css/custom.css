@@ -244,6 +244,10 @@ form.user .form-control-user
   margin-top: 1px;
 }
 
+.badge{
+  padding-top: 5px;
+}
+
 /* .sidebar .nav-item .collapse .collapse-inner .collapse-item{
   color: #fff;
 } */
