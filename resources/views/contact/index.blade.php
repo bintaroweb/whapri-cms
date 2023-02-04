@@ -111,7 +111,7 @@
             processing: true,
             serverSide: true,
             ordering: false,
-            bPaginate: false,
+            bPaginate: true,
             bInfo: false,
             ajax: "{{ url('contacts/datatable') }}",
             columns: [
