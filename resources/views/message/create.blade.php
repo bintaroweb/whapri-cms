@@ -146,12 +146,12 @@
                 if(item.name === null){
                     return {
                         text: item.phone,
-                        id: item.uuid
+                        id: item.phone
                     }
                 } else {
                     return {
                         text: item.name + ' (' + item.phone + ')',
-                        id: item.uuid
+                        id: item.phone
                     }
                 }
               })

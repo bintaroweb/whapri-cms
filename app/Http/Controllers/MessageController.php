@@ -47,6 +47,7 @@ class MessageController extends Controller
                         ->join('devices', 'messages.device_id', '=', 'devices.id')
                         ->select('messages.*', 'contacts.phone as contact', 'contacts.name as contact_name', 'devices.name as device')
                         ->where('messages.type', '=', 'single' )
+                        ->where('messages.user_id', '=', Auth::user()->id)
                         ->where('messages.deleted_at', '=', null )
                         ->where('devices.deleted_at', '=', null )
                         ->orderBy('messages.created_at', 'desc')
@@ -99,8 +100,8 @@ class MessageController extends Controller
      */
     public function autocomplete(Request $request)
     {
-        $data = Contact::where('user_id', Auth::user()->id)->get();
-        return response()->json($data);
+        $contacts = Contact::where('user_id', Auth::user()->id)->get();
+        return response()->json($contacts);
     }
 
     /**
@@ -157,7 +158,8 @@ class MessageController extends Controller
             'user_id' => Auth::user()->id,
             'ack' => $request['ack'],
             'timestamp' => $request['timestamp'],
-            'date' => date("Y-m-d")
+            'date' => date("Y-m-d"),
+            'type' => 'single',
         ]);
 
         return redirect('/messages')->with('success', 'Pesan berhasil ditambah');

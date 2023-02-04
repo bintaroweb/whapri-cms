@@ -49,6 +49,7 @@ class BroadcastController extends Controller
                         ->join('devices', 'messages.device_id', '=', 'devices.id')
                         ->select('messages.*', 'contacts.phone as contact', 'contacts.name as contact_name', 'groups.name as group', 'devices.name as device')
                         ->where('messages.type', '=', 'blast' )
+                        ->where('messages.user_id', '=', Auth::user()->id)
                         ->where('messages.deleted_at', '=', null )
                         ->where('devices.deleted_at', '=', null )
                         ->orderBy('messages.created_at', 'desc')
