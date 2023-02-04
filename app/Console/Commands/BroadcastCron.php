@@ -6,6 +6,8 @@ use App\Models\Contact;
 use App\Models\Device;
 use App\Models\Message;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class BroadcastCron extends Command
 {
@@ -30,24 +32,25 @@ class BroadcastCron extends Command
      */
     public function handle()
     {
-        $client = new \GuzzleHttp\Client();
         $blasts = Message::where('type', 'blast')->where('ack', 0)->get()->unique('user_id');
 
         if (!$blasts->isEmpty()) { 
             foreach($blasts as $blast){
                 $device = Device::find($blast->device_id);
                 $contact = Contact::find($blast->contact_id);
-                $response = $client->request('POST', env('BLAST_URL'), [
-                    'headers' => [
-                        'Content-Type' => 'application/x-www-form-urlencoded',
-                    ],
-                    'form_params' => [
-                        'message' => $blast->message,
-                        'device' => $device->uuid,
-                        'receiver' => $contact->phone
-                    ]
+                $response = Http::timeout(240)->asForm()->post(env('BLAST_URL'), [
+                    'message' => $blast->message,
+                    'device' => $device->uuid,
+                    'receiver' => $contact->phone,
                 ]);
-                $response->getBody();
+                
+                $result = json_decode($response->getBody());
+                Message::where('uuid', $blast->uuid)
+                ->update([
+                    'message_id' => $result->response->id->id,
+                    'timestamp' => $result->response->timestamp,
+                    'ack' => $result->response->ack
+                ]);
             }
         }
         

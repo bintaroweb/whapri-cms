@@ -29,6 +29,7 @@ class Message extends Model
         'ack',
         'timestamp',
         'group_id',
-        'type'
+        'type',
+        'date'
     ];
 }

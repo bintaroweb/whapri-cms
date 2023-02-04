@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DataTables;
+use DateTime;
 use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
@@ -41,37 +42,48 @@ class MessageController extends Controller
      */
     public function datatable()
     {
-        $messages = Message::where('user_id', Auth::user()->id)->orderByDesc('created_at')->get();
+        $messages = DB::table('messages')
+                        ->join('contacts', 'messages.contact_id', '=', 'contacts.id')
+                        ->join('devices', 'messages.device_id', '=', 'devices.id')
+                        ->select('messages.*', 'contacts.phone as contact', 'contacts.name as contact_name', 'devices.name as device')
+                        ->where('messages.type', '=', 'single' )
+                        ->where('messages.deleted_at', '=', null )
+                        ->where('devices.deleted_at', '=', null )
+                        ->orderBy('messages.created_at', 'desc')
+                        ->get();
+        
         $data= [];
 
+        // dd($messages);
+
         foreach($messages as $message){
-            $message['date'] = date_format($message->created_at, 'd-m-Y h:i:s');
+            // $message->date = \Carbon\Carbon::parse($message->created_at)->format('d M Y H:i:s');
+            $message->date = date("d-m-Y H:i:s", $message->timestamp);
 
             if(strlen($message->message) > 150) {
                 $string = substr($message->message, 0, 150).'...';
-                $message['message'] = $string;
+                $message->message = $string;
             } else {
-                $message['message'] = $message->message;
+                $message->message = $message->message;
             }
 
-            $contact = Contact::where('id', $message->contact_id)->first();
-            // dd($message->contact_id);
-            // $nama = $contact->phone;
+            if(!empty($message->contact_name)){
+                $message->name = $message->contact . ' (' . $message->contact_name . ')';
+            } else {
+                $message->name  = $message->contact;
+            }
+            
+            $message->file = $message->file;
+            $message->ack = $message->ack;
 
-            // echo $contact->name;
-            $message['name'] = $contact->phone . ' (' . $contact->name . ')';
+            // $user = User::where('id', $message->user_id)->first();
+            // $message['user'] = $user->name;
 
-            $message['file'] = $message->file;
-            $message['ack'] = $message->ack;
-
-            $user = User::where('id', $message->user_id)->first();
-            $message['user'] = $user->name;
-
-            $device = Device::where('id', $message->device_id)->first();
-            $message['device'] = $device->name;
+            // $device = Device::where('id', $message->device_id)->first();
+            $message->device = $message->device;
 
 
-            $message['time'] = date("Y-m-d H:i:s", $message->timestamp); 
+            $message->time = date("Y-m-d H:i:s", $message->timestamp); 
 
             array_push($data, $message);
         }
@@ -105,7 +117,8 @@ class MessageController extends Controller
 
     public function template(Request $request)
     {
-        $template = Template::where('uuid', $request->uuid)->first();  
+        $template = Template::where('uuid', $request->uuid)->first(); 
+         
         return response()->json([
             'success' => true,
             'template' => $template
@@ -144,6 +157,7 @@ class MessageController extends Controller
             'user_id' => Auth::user()->id,
             'ack' => $request['ack'],
             'timestamp' => $request['timestamp'],
+            'date' => date("Y-m-d")
         ]);
 
         return redirect('/messages')->with('success', 'Pesan berhasil ditambah');

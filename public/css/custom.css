@@ -248,6 +248,30 @@ form.user .form-control-user
   padding-top: 5px;
 }
 
+.bg-gold{
+  background: #DAA520;
+}
+
+.border-gold{
+  border: 1px solid #DAA520;
+}
+
+.bg-platinum{
+  background: #E5E4E2;
+}
+
+.border-platinum{
+  border: 1px solid #E5E4E2;
+}
+
+.text-gray-800{
+  color: #000 !important;
+}
+
+.sidebar.toggled .sidebar-brand .sidebar-brand-text img {
+  width: 20px;
+}
+
 /* .sidebar .nav-item .collapse .collapse-inner .collapse-item{
   color: #fff;
 } */

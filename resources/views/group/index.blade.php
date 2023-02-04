@@ -13,7 +13,7 @@
 <div class="row">
     <div class="col-md-10">
         <!-- Page Heading -->
-        <h3 class="h3 mb-3 text-gray-800">Daftar Group</h3>
+        <h3 class="h3 mb-3">Daftar Group</h3>
     </div>
     <div class="col-md-2 d-md-flex justify-content-md-end">
         <a href="{{ url('/groups/create') }}" class="btn btn-primary btn-md mb-3" role="button"><i class="fas fa-plus"></i> Tambah</a>

@@ -31,11 +31,11 @@
             <table class="table" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>Tanggal</th>
+                        <th width="100">Tanggal</th>
                         <th>Penerima</th>
                         <th>Pesan</th>
-                        <th>Status</th>
-                        <th>User/CS</th>
+                        <th class="text-center">Status</th>
+                        <!-- <th>User/CS</th> -->
                         <th>Perangkat</th>
                         <th></th>
                     </tr>
@@ -115,17 +115,17 @@
                 { data: "status", 
                     render: function (data, type, row) {
                         if (row.ack == 0 || row.ack == 1) {
-                            return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah diterima"><i class="fa-solid fa-check"></i><br/><span class="small">Sent at <br>'+row.time+'</span></div></div>';
+                            return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah diterima"><i class="fa-solid fa-check"></i><!--span class="small">Viewed at <br>'+row.time+'</span--></div></div>';
                         } else if (row.ack == 2) {
-                            return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah diterima"><i class="fa-solid fa-check-double"></i><br/><span class="small">Delivered at <br>'+row.time+'</span></div></div>';
+                            return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah diterima"><i class="fa-solid fa-check-double"></i><!--span class="small">Viewed at <br>'+row.time+'</span--></div>';
                         } else if (row.ack == 3) {
-                            return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah dibaca"><i class="fa-solid fa-check-double text-success"></i><br/><span class="small">Viewed at <br>'+row.time+'</span></div></div>';
+                            return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah dibaca"><i class="fa-solid fa-check-double text-success"></i><!--span class="small">Viewed at <br>'+row.time+'</span--></div></div>';
                         } else {
                             return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan tidak terkirim"><i class="fa-solid fa-xmark text-danger"></i><br/><span class="small">Send message failed</span></div></div>';
                         } 
                     }
                 },
-                { data: "user", className: "user"},
+                // { data: "user", className: "user"},
                 { data: "device", className: "device"},
                 { "mRender": function ( data, type, row ) {
                     return '<div class="d-md-flex justify-content-md-end"><a href="#" class="btn btn-secondary btn-sm detail mx-2" data-uuid="'+row.uuid+'"><i class="fa-solid fa-eye"></i></a> <a href="#" class="btn btn-danger btn-sm delete" data-uuid="'+row.uuid+'"><i class="fa-solid fa-trash"></i></a></div>';}

@@ -87,9 +87,9 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ url('/templates') }}" title="Template">
+                <a class="nav-link {{ (request()->is('templates*')) ? 'text-light fw-bold' : '' }}" href="{{ url('/templates') }}" title="Template">
                     <div class="menu-icon">
-                        <i class="fa-solid fa-file"></i>
+                        <i class="fa-solid fa-file {{ (request()->is('templates*')) ? 'text-light' : '' }}"></i>
                     </div>
                     <span>Template</span>
                 </a>
@@ -108,9 +108,9 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link {{ (request()->is('users')) ? 'text-info' : '' }}" href="{{ url('/users/'. Auth::user()->uuid .'/edit') }}" title="Pengguna">
+                <a class="nav-link {{ (request()->is('users*')) ? 'text-info' : '' }}" href="{{ url('/users/'. Auth::user()->uuid .'/edit') }}" title="Pengguna">
                     <div class="menu-icon">
-                        <i class="fa-solid fa-user {{ (request()->is('users')) ? 'text-light' : '' }}"></i>
+                        <i class="fa-solid fa-user {{ (request()->is('users*')) ? 'text-light' : '' }}"></i>
                     </div>
                     <span>Profile</span>
                 </a>
@@ -119,9 +119,9 @@
             <hr class="sidebar-divider mb-1 mt-1">
 
             <li class="nav-item">
-                <a class="nav-link {{ (request()->is('customers*')) ? 'text-info' : '' }}" title="Deposit" href="{{ url('/billings') }}">
+                <a class="nav-link {{ (request()->is('billings*')) ? 'text-info' : '' }}" title="Deposit" href="{{ url('/billings') }}">
                     <div class="menu-icon">
-                        <i class="fa-solid fa-wallet {{ (request()->is('customers')) ? 'text-light' : '' }}"></i>
+                        <i class="fa-solid fa-wallet {{ (request()->is('billings*')) ? 'text-light' : '' }}"></i>
                     </div>
                     <span>Billing</span>
                 </a>

@@ -16,38 +16,28 @@
 <div class="row">
     <div class="col-md-10">
         <!-- Page Heading -->
-        <h3 class="h3 mb-3">Billing</h3>
+        <h3 class="h3 mb-3 text-gray-800">History Transaksi</h3>
     </div>
-    <div class="col-md-2 d-md-flex justify-content-md-end">
+    <!-- <div class="col-md-2 d-md-flex justify-content-md-end">
         <a href="#" class="btn btn-primary btn-md mb-3" role="button" id="topup"><i class="fas fa-plus"></i> Tambah Saldo</a>
-    </div>
+    </div> -->
 </div>
 
 
 <div class="row">
     <div class="col-md-12">
         <div class="card shadow mb-4">
-            <!-- <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">History Topup</h6>
-            </div> -->
-            <div class="card-body mx-3 mt-2">
-                <h4>Saldo</h4>
-                <h3 class="fw-bold mb-3">Rp. {{ number_format($balance, '0', ',', '.') }}</h3>
-                <!-- <a href="#" id="topup" class="btn btn-primary">Topup</a> -->
-                <a href="{{ url('billings/transaction') }}" class="btn btn-primary btn-sm">List Transaksi</a>
-            </div>
-
             <div class="card-body">
                 <div class="table-responsive">
-                    <!-- <h6>History Topup</h6> -->
                     <table class="table billing" id="dataTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                <th>Invoice</th>
+                                <th>Jenis Transaksi</th>
                                 <th>Nominal</th>
-                                <th>Metode Pembayaran</th>
+                                <!-- <th>Metode Pembayaran</th> -->
                                 <th>Status</th>
+                                <th>Deskripsi</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -84,27 +74,38 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Detail Pembayaran</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Detail Transaksi</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="payment">
             <table>
                 <tr>
+                    <td>Jenis Transaksi</td>
+                    <td class="px-2">:</td>
+                    <td><span id="type" class="text-capitalize"></span></td>
+                </tr>
+                <tr class="invoice">
                     <td>No Invoice</td>
                     <td class="px-2">:</td>
                     <td>#<span id="invoice"></span></td>
+                </tr>
+                <tr class="package">
+                    <td>Paket</td>
+                    <td class="px-2">:</td>
+                    <td><span id="package" class="text-capitalize">-</span></td>
                 </tr>
                 <tr>
                     <td>Waktu Pembayaran</td>
                     <td class="px-2">:</td>
                     <td><span id="settlement_time"></span></td>
                 </tr>
-                <tr>
+                <tr class="payment_method">
                     <td>Metode Pembayaran</td>
                     <td class="px-2">:</td>
-                    <td><span id="payment_method" class="text-capitalize"></span></td>
+                    <td><span id="payment_method" class="text-capitalize">-</span></td>
                 </tr>
+                
                 <tr>
                     <td>Nominal</td>
                     <td class="px-2">:</td>
@@ -167,16 +168,12 @@
             drawCallback: function () {
                 $('[data-bs-toggle="tooltip"]').tooltip();
             },
-            ajax: "{{ url('billings/datatable') }}",
+            ajax: "{{ url('billings/datatable_transaction') }}",
             columns: [
                 { data:"date", className:"date"},
-                { "mRender": function ( data, type, row ) 
-                    {
-                        return '#'+ row.id +'';
-                    }
-                },
+                { data:"type", className:"type text-capitalize"},
                 { data:"amount", className:"amount"},
-                { data:"payment_method", className:"payment_method text-capitalize"},
+                // { data:"payment_method", className:"payment_method text-capitalize"},
                 { "mRender": function ( data, type, row ) 
                     {
                         if(row.status == 'paid'){
@@ -187,6 +184,7 @@
                         
                     }
                 },
+                { data:"description", className:"description"},
                 { "mRender": function ( data, type, row ) 
                     {
                         if(row.status == 'paid'){
@@ -253,6 +251,7 @@
                 },
                 success: function(result) { 
                     if(result.success){
+                        // console.log(result);
                         window.snap.pay(result.token);
                     }
                 }
@@ -269,8 +268,18 @@
                     uuid: uuid, 
                 },
                 success: function(result) { 
-                    console.log(result);
+                    if(result.billing.type == 'topup'){
+                        $('.package').addClass('d-none');
+                        $('.payment_method').removeClass('d-none');
+                        $('.invoice').removeClass('d-none');
+                    } else {
+                        $('.package').removeClass('d-none');
+                        $('.payment_method').addClass('d-none');
+                        $('.invoice').addClass('d-none');
+                    }
+                    $('#type').text(result.billing.type)
                     $('#invoice').text(result.billing.id)
+                    $('#package').text(result.billing.package)
                     $('#payment_method').text(result.billing.payment_method)
                     $('#settlement_time').text(result.billing.settlement_time)
                     $('#status').text(result.billing.status)

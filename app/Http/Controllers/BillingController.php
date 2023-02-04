@@ -17,11 +17,17 @@ class BillingController extends Controller
      */
     public function index()
     { 
-        // $balance = DB::table('billing')
-        //             ->where('user_id', Auth::user()->id)
-        //             ->first();
+        $topup = Billing::where('user_id', Auth::user()->id)
+                    ->where('type', 'topup')
+                    ->where('status', 'paid')
+                    ->sum('amount');
+        $beli = Billing::where('user_id', Auth::user()->id)
+                    ->where('type', 'beli')
+                    ->where('status', 'paid')
+                    ->sum('amount');
+        $balance = $topup - $beli;
         
-        return view('billing.index', ['balance' => 0]);
+        return view('billing.index', ['balance' => $balance]);
     }
 
     /**
@@ -31,7 +37,11 @@ class BillingController extends Controller
      */
     public function datatable()
     {
-        $billings = Billing::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->get();
+        $billings = Billing::where('user_id', Auth::user()->id)
+                        ->where('type', 'topup')
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+        
         foreach($billings as $billing){
             $billing['amount'] = 'Rp. ' . number_format($billing['amount'], 0, ',', '.');
             $billing['date'] = date_format($billing->created_at, 'd-m-Y');
@@ -60,7 +70,7 @@ class BillingController extends Controller
 
         Billing::create([
             'amount' => $request['amount'],
-            'status' => 'Pending',
+            'status' => 'pending',
             'type' => 'topup',
             'user_id' => Auth::user()->id,
         ]);
@@ -109,6 +119,54 @@ class BillingController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function transaction()
+    {        
+        return view('billing.transaction');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function datatable_transaction()
+    {
+        $billings = Billing::where('user_id', Auth::user()->id)
+                        ->where('status', 'paid')
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+
+        foreach($billings as $billing){
+            $billing['amount'] = 'Rp. ' . number_format($billing['amount'], 0, ',', '.');
+            $billing['date'] = date_format($billing->created_at, 'd-m-Y');
+            $billing['id'] = $billing['id'];
+            if($billing['payment_method'] == 'bank_transfer'){
+                $billing['payment_method'] = 'Bank Transfer';
+            } else if($billing['payment_method'] == 'credit_card'){
+                $billing['payment_method'] = 'Kartu Kredit';
+            }else if($billing['payment_method'] == 'cstore'){
+                $billing['payment_method'] = 'Minimarket';
+            } else if($billing['payment_method'] == 'bri_epay'){
+                $billing['payment_method'] = 'BRImo';
+            } else if($billing['payment_method'] == 'qris'){
+                $billing['payment_method'] = 'QRIS';
+            }
+
+            if($billing['type'] == 'beli'){
+                $billing['description'] = 'Pembelian paket ' . ucfirst($billing['package']);
+            } else {
+                $billing['description'] = 'Topup saldo melalui ' . ucfirst($billing['payment_method']);
+            }
+            
+        }
+        return DataTables::of($billings)->make(true);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param  int  $id
@@ -135,6 +193,8 @@ class BillingController extends Controller
             ]);
         // }  
     }
+
+
 
     /**
      * Show the form for creating a new resource.

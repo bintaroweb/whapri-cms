@@ -25,9 +25,11 @@ Route::get('users/datatable', [\App\Http\Controllers\UserController::class, 'dat
 Route::resource('users', '\App\Http\Controllers\UserController');
 //Device
 Route::get('devices/datatable', [\App\Http\Controllers\DeviceController::class, 'datatable']);
+Route::post('devices/status', [\App\Http\Controllers\DeviceController::class, 'status']);
 Route::resource('devices', '\App\Http\Controllers\DeviceController');
 //Contact
 Route::get('contacts/datatable', [\App\Http\Controllers\ContactController::class, 'datatable']);
+Route::post('contacts/import', [\App\Http\Controllers\ContactController::class, 'import']);
 Route::resource('contacts', '\App\Http\Controllers\ContactController');
 //Message
 Route::get('messages/autocomplete', [\App\Http\Controllers\MessageController::class, 'autocomplete']);
@@ -49,7 +51,9 @@ Route::get('templates/autocomplete', [\App\Http\Controllers\TemplateController::
 Route::resource('templates', '\App\Http\Controllers\TemplateController');
 //Billing
 Route::get('billings/datatable', [\App\Http\Controllers\BillingController::class, 'datatable']);
+Route::get('billings/datatable_transaction', [\App\Http\Controllers\BillingController::class, 'datatable_transaction']);
 Route::get('billings/autocomplete', [\App\Http\Controllers\BillingController::class, 'autocomplete']);
 Route::post('billings/payment', [\App\Http\Controllers\BillingController::class, 'payment']);
 Route::get('billings/detail', [\App\Http\Controllers\BillingController::class, 'detail']);
+Route::get('billings/transaction', [\App\Http\Controllers\BillingController::class, 'transaction']);
 Route::resource('billings', '\App\Http\Controllers\BillingController');

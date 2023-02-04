@@ -14,6 +14,6 @@ class Billing extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'uuid', 'amount', 'status', 'type', 'user_id'
+        'uuid', 'amount', 'status', 'type', 'user_id', 'package', 'device_id'
     ];
 }

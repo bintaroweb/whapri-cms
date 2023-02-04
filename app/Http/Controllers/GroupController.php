@@ -139,10 +139,10 @@ class GroupController extends Controller
         Group::where('uuid', $uuid)
                 ->update([
                     'name' => $request->name, 
-                    'label' => $request->label
+                    'label' => $request->label, 
+                    'total' =>  count($request->phones)
                 ]);
         
-
         $group = Group::where('uuid', $uuid)->first();
         $contacts = Contact::where('group_id', $group->id)->get();
 

@@ -2,15 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Billing;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
 use Ramsey\Uuid\Uuid as Generator;
 
 class DeviceController extends Controller
 {
+    private function price($package){
+        if($package == 'trial'){
+            $price = 0;
+        } else if($package == 'silver'){
+            $price = 50000;
+        } else if($package == 'gold'){
+            $price = 100000;
+        } else {
+            $price = 150000;
+        }
+
+        return $price;
+    }
+
+    private function balance(){
+        $topup = Billing::where('user_id', Auth::user()->id)
+                    ->where('type', 'topup')
+                    ->where('status', 'paid')
+                    ->sum('amount');
+        $beli = Billing::where('user_id', Auth::user()->id)
+                    ->where('type', 'beli')
+                    ->where('status', 'paid')
+                    ->sum('amount');
+        $balance = $topup - $beli;
+        return $balance;
+    }
+
     /**
      * Create a middleware auth.
      *
@@ -49,8 +78,12 @@ class DeviceController extends Controller
      */
     public function create()
     {
-        $uuid = Generator::uuid4()->toString();
-        return view('device.create', ['uuid' => $uuid]);
+        $trial = Device::where('user_id', Auth::user()->id)
+                    ->where('package', 'trial')
+                    ->count();
+        $balance = $this->balance();
+
+        return view('device.create', ['trial' => $trial, 'balance' => $balance]);
     }
 
     /**
@@ -64,19 +97,101 @@ class DeviceController extends Controller
 
         $request->validate([
             'name' => 'required|string',
-            'note'  => 'string'        
+            'note'  => 'nullable|string',
+            'package' => 'required|string'       
         ]);
 
-        Device::create([
-            'uuid' => $request['uuid'],
-            'user_id' => Auth::user()->id,
-            'name' => $request['name'],
-            'note' => $request['note'],
-            'status' => $request['status'],
-            'active_period' => date('Y-m-d', strtotime("+30 days"))
+        if($this->price($request->package) > $this->balance() ){
+            return redirect('/devices')->with('error', 'Perangkat gagal ditambah');
+        }
+
+        if($request != 'trial'){
+            $device = Device::create([
+                'user_id' => Auth::user()->id,
+                'name' => $request['name'],
+                'note' => $request['note'],
+                'status' => 'disconnected',
+                'package' => $request['package'],
+                'active_period' => date('Y-m-d', strtotime("+30 days"))
+            ]);
+
+            Billing::create([
+                'amount' => $this->price($request->package),
+                'status' => 'paid',
+                'type' => 'beli',
+                'package' => $request['package'],
+                'user_id' => Auth::user()->id,
+                'device_id' => $device->id
+            ]);
+        } else {
+            $device = Device::create([
+                'uuid' => $request['uuid'],
+                'user_id' => Auth::user()->id,
+                'name' => $request['name'],
+                'note' => $request['note'],
+                'status' => $request['status'],
+                'package' => $request['package'],
+                'active_period' => date('Y-m-d', strtotime("+7 days"))
+            ]);
+
+            Billing::create([
+                'amount' => $this->price($request->package),
+                'status' => 'paid',
+                'type' => 'beli',
+                'package' => $request['package'],
+                'user_id' => Auth::user()->id,
+                'device_id' => $device->id
+            ]);
+        }
+
+        // return response()->json([
+        //     'success' => true,
+        //     'template' => $device
+        // ]);  
+        
+        return redirect('/devices')->with('success', 'Perangkat berhasil ditambah');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($uuid)
+    {
+        $device = Device::where('uuid', $uuid)->first();
+
+        return response()->json([
+            'success' => true,
+            'device' => $device
+        ]); 
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+    public function status(Request $request){
+        $request->validate([
+            'uuid' => 'required|string',
+            'status' => 'required|string'
         ]);
 
-        // return redirect('/devices')->with('success', 'Teknisi berhasil ditambah');
+        Device::where('uuid', $request->uuid)
+            ->update([
+                'status' => $request->status
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'status' => $request->status
+        ]); 
+        
     }
 
     /**

@@ -16,7 +16,7 @@
         <div class="col-md-8">
         <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">Kirim WhatsApp</h5>
+                    <h5 class="card-title mt-2">Kirim WhatsApp</h5>
                 </div>
                 <div class="card-body">
                     <form method="post" action="{{ url('/messages') }}" id="send-message">
@@ -143,11 +143,18 @@
           processResults: function (data) {
             return {
               results:  $.map(data, function (item) {
+                if(item.name === null){
+                    return {
+                        text: item.phone,
+                        id: item.uuid
+                    }
+                } else {
                     return {
                         text: item.name + ' (' + item.phone + ')',
-                        id: item.phone
+                        id: item.uuid
                     }
-                })
+                }
+              })
             };
           },
           escapeMarkup: function (markup) {

@@ -11,12 +11,13 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-8">
         <!-- Page Heading -->
         <h3 class="h3 mb-3 text-gray-800">Daftar Kontak</h3>
     </div>
-    <div class="col-md-2 d-md-flex justify-content-md-end">
-        <a href="{{ url('/contacts/create') }}" class="btn btn-primary btn-md mb-3" role="button"><i class="fas fa-plus"></i> Tambah</a>
+    <div class="col-md-4 d-md-flex justify-content-md-end">
+        <a href="{{ url('/contacts/create') }}" class="btn btn-primary btn-md mb-3 me-2" role="button"><i class="fas fa-plus"></i> Tambah</a>
+        <a href="{{ url('/contacts/import') }}" class="btn btn-primary btn-md mb-3" role="button" id="import"><i class="fa-solid fa-file-import"></i> Import</a>
     </div>
 </div>
 
@@ -66,6 +67,35 @@
     @csrf
 </form>
 
+<!-- Modal Import -->
+<div class="modal fade" id="modal-import" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Import Kontak</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="import-form" method="post" action="{{ url('contacts/import') }}" enctype="multipart/form-data">
+          @csrf
+          <div class="form-group">
+              <!-- <label for="name" class="required">Pilih File</label> -->
+              <input type="file" class="form-control form-control-sm " id="upload" name="upload" accept=".csv" required>
+              <!-- <small class="form-text text-muted">Bisa input nama usaha/perusahaan jika memang tidak diketahui Contact Personnya</small> -->
+          </div>
+          <div>
+              <p>Download contoh file csv <a href="{{ asset('files/Format-Import-Kontak.csv') }}">disini </a>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-primary" id="confirm-import">Proses</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 @endsection
 
@@ -108,6 +138,15 @@
     $('#confirm-delete').click(function(){
         // document.getElementById('logout-form').submit();
         $('#delete-form').submit();
+    })
+
+    $('#import').click(function(e){
+           e.preventDefault();
+           $('#modal-import').modal('show');
+        })
+
+    $('#confirm-import').click(function(){
+        $('#import-form').submit();
     })
     
 </script>

@@ -32,7 +32,7 @@ class HomeController extends Controller
         $message = Message::where('user_id', Auth::user()->id)->count();
         $contact = Contact::where('user_id', Auth::user()->id)->count();
         $group = Group::where('user_id', Auth::user()->id)->count();
-        $device = Device::where('user_id', Auth::user()->id)->count();
+        $device = Device::where('user_id', Auth::user()->id)->where('status', 'connected')->count();
         return view('home', compact('message', 'contact', 'group', 'device'));
     }
 }

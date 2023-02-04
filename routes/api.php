@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\BillingController;
+use App\Http\Controllers\Api\DeviceController;
+use App\Http\Controllers\Api\MessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('billing/notification', [BillingController::class, 'notification']);
+Route::post('device/status', [DeviceController::class, 'status']);
+Route::post('message/status', [MessageController::class, 'status']);
+Route::get('message/blast', [MessageController::class, 'blast']);

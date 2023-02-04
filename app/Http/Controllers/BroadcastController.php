@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\Foreach_;
 
 class BroadcastController extends Controller
@@ -42,35 +43,47 @@ class BroadcastController extends Controller
      */
     public function datatable()
     {
-        $messages = Message::where('user_id', Auth::user()->id)->where('type', 'blast')->orderByDesc('created_at')->get();
+        $messages = $messages = DB::table('messages')
+                        ->join('groups', 'messages.group_id', '=', 'groups.id')
+                        ->join('contacts', 'messages.contact_id', '=', 'contacts.id')
+                        ->join('devices', 'messages.device_id', '=', 'devices.id')
+                        ->select('messages.*', 'contacts.phone as contact', 'contacts.name as contact_name', 'groups.name as group', 'devices.name as device')
+                        ->where('messages.type', '=', 'blast' )
+                        ->where('messages.deleted_at', '=', null )
+                        ->where('devices.deleted_at', '=', null )
+                        ->orderBy('messages.created_at', 'desc')
+                        ->get();
         $data= [];
 
         foreach($messages as $message){
-            $message['date'] = date_format($message->created_at, 'd-m-Y h:i:s');
+            $message->date = \Carbon\Carbon::parse($message->created_at)->format('d M Y H:i:s');
 
             if(strlen($message->message) > 150) {
                 $string = substr($message->message, 0, 150).'...';
-                $message['message'] = $string;
+                $message->message = $string;
             } else {
-                $message['message'] = $message->message;
+                $message->message = $message->message;
             }
 
-            $contact = Contact::where('id', $message->contact_id)->first();
-            $message['name'] = $contact->phone . ' (' . $contact->name . ')';
+            if(!empty($message->contact_name)){
+                $message->name = $message->contact . ' (' . $message->contact_name . ')';
+            } else {
+                $message->name  = $message->contact;
+            }
 
-            $message['file'] = $message->file;
-            $message['ack'] = $message->ack;
+            $message->file = $message->file;
+            $message->ack = $message->ack;
 
-            $user = User::where('id', $message->user_id)->first();
-            $message['user'] = $user->name;
+            // $user = User::where('id', $message->user_id)->first();
+            // $message['user'] = $user->name;
 
-            $device = Device::where('id', $message->device_id)->first();
-            $message['device'] = $device->name;
+            // $device = Device::where('id', $message->device_id)->first();
+            $message->device = $message->device;
 
-            $group = Group::where('id', $message->group_id)->first();
-            $message['group'] = $group->name;
+            // $group = Group::where('id', $message->group_id)->first();
+            $message->group = $message->group;
 
-            $message['time'] = date("Y-m-d H:i:s", $message->timestamp); 
+            $message->time = date("d-m-Y H:i:s", $message->timestamp); 
 
             array_push($data, $message);
         }
