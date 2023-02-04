@@ -76,7 +76,7 @@
           processResults: function (data) {
             return {
               results:  $.map(data, function (item) {
-                    if(item.name.length === 0){
+                    if(item.name === null){
                         return {
                             text: item.phone,
                             id: item.uuid
