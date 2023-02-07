@@ -14,16 +14,16 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-        <div class="card">
+            <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mt-2">Kirim WhatsApp</h5>
                 </div>
                 <div class="card-body">
                     <form method="post" action="{{ url('/messages') }}" id="send-message">
                         <input type="hidden" id="uuid" />
-                        <input type="hidden" name="ack" id="ack" />
-                        <input type="hidden" name="message_id" id="messageId" />
-                        <input type="hidden" name="timestamp" id="timestamp" />
+                        <!-- <input type="hidden" name="ack" id="ack" /> -->
+                        <!-- <input type="hidden" name="message_id" id="messageId" /> -->
+                        <!-- <input type="hidden" name="timestamp" id="timestamp" /> -->
                         @csrf
                         <div class="form-group">
                             <label for="title" class="required" name="message" required>Isi Pesan</label>
@@ -237,51 +237,86 @@
         })
     })
 
-    $('#simpan').click(function(e){
-        e.preventDefault();
-        $(this).attr('disabled', 'disabled');
+    // $('#simpan').click(function(e){
+    //     e.preventDefault();
+    //     $(this).attr('disabled', 'disabled');
 
-        var message = $('#message').val();
-        var receiver = $('#receiver').val();
-        var device = $('#uuid').val();
+    //     var message = $('#message').val();
+    //     var receiver = $('#receiver').val();
+    //     var device = $('#uuid').val();
 
-        doAjax();
+    //     doAjax();
 
-        async function doAjax(args) {
-            let result;
-            try {
-                result = await $.ajax({
-                    type: 'POST',
-                    url: "{{ env('SOCKET_URL') }}/send-message",
-                    data: { 
-                        message: message, 
-                        device: device,
-                        receiver: receiver
-                    },
-                    success: function(result) { 
-                        console.log(result)
-                        if(result.status){
-                            $('#messageId').val(result.response.id.id)
-                            $('#ack').val(result.response.ack);
-                            $('#timestamp').val(result.response.timestamp);
-                            $("#send-message").submit();
-                        } else {
-                            toastr.options = {
-                                "closeButton" : true,
-                                "positionClass": "toast-bottom-right",
-                            }
-                            toastr.error("Pesan gagal dikirim");
-                        }
+    //     function doAjax() {
+    //         try {
+    //             $.ajax({
+    //                 type: 'POST',
+    //                 url: "{{ url('/send-message') }}",
+    //                 data: { 
+    //                     message: message, 
+    //                     device: device,
+    //                     receiver: receiver
+    //                 },
+    //                 success: function(result) { 
+    //                     console.log(result)
+    //                     if(result.status){
+    //                         $('#messageId').val(result.response.id.id)
+    //                         $('#ack').val(result.response.ack);
+    //                         $('#timestamp').val(result.response.timestamp);
+    //                         $("#send-message").submit();
+    //                     } else {
+    //                         toastr.options = {
+    //                             "closeButton" : true,
+    //                             "positionClass": "toast-bottom-right",
+    //                         }
+    //                         toastr.error("Pesan gagal dikirim");
+    //                     }
                         
-                    }
-                })
-                return result;
-            } catch (error) {
-                $('#simpan').prop("disabled", false);
-                console.error(error);
-            }
-        }
-    })
+    //                 }
+    //             })
+    //         } catch (error) {
+    //             $('#simpan').prop("disabled", false);
+    //             console.error(error);
+    //         }
+    //     }
+
+       
+
+    //     // async function doAjax(args) {
+    //     //     let result;
+    //     //     try {
+    //     //         result = await $.ajax({
+    //     //             type: 'POST',
+    //     //             url: "{{ env('SOCKET_URL') }}/send-message",
+    //     //             data: { 
+    //     //                 message: message, 
+    //     //                 device: device,
+    //     //                 receiver: receiver
+    //     //             },
+    //     //             success: function(result) { 
+    //     //                 console.log(result)
+    //     //                 if(result.status){
+    //     //                     $('#messageId').val(result.response.id.id)
+    //     //                     $('#ack').val(result.response.ack);
+    //     //                     $('#timestamp').val(result.response.timestamp);
+    //     //                     $("#send-message").submit();
+    //     //                 } else {
+    //     //                     toastr.options = {
+    //     //                         "closeButton" : true,
+    //     //                         "positionClass": "toast-bottom-right",
+    //     //                     }
+    //     //                     toastr.error("Pesan gagal dikirim");
+    //     //                 }
+                        
+    //     //             }
+    //     //         })
+    //     //         return result;
+    //     //     } catch (error) {
+    //     //         $('#simpan').prop("disabled", false);
+    //     //         console.error(error);
+    //     //     }
+    //     // }
+    // })
     
     function onlyNumberKey(evt) {
         // Only ASCII character in that range allowed

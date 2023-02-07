@@ -139,9 +139,9 @@ class MessageController extends Controller
             'message' => 'required',
             'receiver'  => 'string',
             'device' => 'required',
-            'message_id' => 'required',
-            'ack' => 'required',
-            'timestamp' => 'required'
+            // 'message_id' => 'required',
+            // 'ack' => 'required',
+            // 'timestamp' => 'required'
         ]);
 
         $device = Device::where('uuid', $request['device'])->first();
@@ -152,12 +152,12 @@ class MessageController extends Controller
 
         Message::create([
             'message' => $request['message'],
-            'message_id' => $request['message_id'],
+            // 'message_id' => $request['message_id'],
             'contact_id' => $contact->id,
             'device_id' => $device->id,
             'user_id' => Auth::user()->id,
-            'ack' => $request['ack'],
-            'timestamp' => $request['timestamp'],
+            'ack' => 0,
+            // 'timestamp' => $request['timestamp'],
             'date' => date("Y-m-d"),
             'type' => 'single',
         ]);

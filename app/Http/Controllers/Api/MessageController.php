@@ -8,26 +8,34 @@ use App\Models\Device;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
     public function status(Request $request) 
     {
         $request->validate([
-            'id' => 'required|string',
             'ack' => 'required',
             'timestamp' => 'required'   
         ]);
 
-        $message = Message::where('message_id', $request->id)
+        if(!empty($request->uuid)){
+            Message::where('uuid', $request->uuid)
+            ->update([
+                'ack' => $request->ack,
+                'timestamp' => $request->timestamp,
+                'message_id' => $request->message
+            ]);
+        } else {
+            Message::where('message_id', $request->id)
             ->update([
                 'ack' => $request->ack,
                 'timestamp' => $request->timestamp
             ]);
+        }       
 
         return response()->json([
-            'success' => true,
-            'status' => $message
+            'success' => true
         ]); 
     }
 
@@ -64,5 +72,29 @@ class MessageController extends Controller
                 ]);
             }
         }
+    }
+
+    public function send(){
+        $messages = Message::where('type', 'single')->where('ack', 0)->get()->unique('user_id');
+        $response = [];
+
+        if (!$messages->isEmpty()) { 
+            foreach($messages as $message){
+                $device = Device::find($message->device_id);
+                $contact = Contact::find($message->contact_id);
+                $data = [
+                    'uuid' => $message->uuid,
+                    'message' => $message->message,
+                    'device' => $device->uuid,
+                    'receiver' => $contact->phone,
+                ];
+                array_push($response, $data);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $response
+        ]);
     }
 }

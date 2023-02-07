@@ -25,3 +25,4 @@ Route::post('billing/notification', [BillingController::class, 'notification']);
 Route::post('device/status', [DeviceController::class, 'status']);
 Route::post('message/status', [MessageController::class, 'status']);
 Route::get('message/blast', [MessageController::class, 'blast']);
+Route::get('message/send', [MessageController::class, 'send']);
