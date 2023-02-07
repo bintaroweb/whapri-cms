@@ -76,7 +76,6 @@ class ContactController extends Controller
     public function import(Request $request)
     {
         $file = $request->file("upload");
-        // dd($file);
 
         if ($file) {
             $filename = $file->getClientOriginalName();
@@ -115,11 +114,14 @@ class ContactController extends Controller
             $j = 0;
             // dd($importData_arr);
             foreach ($importData_arr as $importData) {
-                // dd($importData[1]);
+                // dd($importData);
                 $j++;
+
+                $phone = str_replace(' ', '', $importData[0]);
+                $phone = str_replace('-', '', $phone);
                 Contact::create([
                     "name" => $importData[1],
-                    "phone" => $importData[0],
+                    "phone" => $phone,
                     "source" => 'import',
                     "user_id" => Auth::user()->id
                 ]);
