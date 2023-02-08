@@ -90,11 +90,17 @@ class MessageController extends Controller
                 ];
                 array_push($response, $data);
             }
+            return response()->json([
+                'success' => true,
+                'message' => $response
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => "Tidak ada pesan yang akan dikirim"
+            ]);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => $response
-        ]);
+        
     }
 }
