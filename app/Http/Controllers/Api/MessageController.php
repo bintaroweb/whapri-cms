@@ -78,6 +78,8 @@ class MessageController extends Controller
         $messages = Message::where('type', 'single')->where('ack', 0)->get()->unique('user_id');
         $response = [];
 
+        dd($messages);
+
         if (!$messages->isEmpty()) { 
             foreach($messages as $message){
                 $device = Device::find($message->device_id);
