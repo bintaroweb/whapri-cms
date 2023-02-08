@@ -131,7 +131,7 @@
     $( document ).on("click", ".delete", function(e){
         e.preventDefault();
         var uuid = $(this).data('uuid');
-        $('#delete-form').attr('action', '{{ env("APP_URL") }}/contacts/'+uuid+'');
+        $('#delete-form').attr('action', '{{ url("/contacts") }}/'+uuid+'');
         $('#modal-delete').modal('show');
     })
 
