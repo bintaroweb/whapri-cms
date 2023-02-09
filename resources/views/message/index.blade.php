@@ -117,7 +117,7 @@
                         if (row.ack == 0) {
                             return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan dalam antrian pengiriman"><i class="fa-solid fa-spinner"></i></div></div>';
                         } else if (row.ack == 1) {
-                            return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah diterima"><i class="fa-solid fa-check"></i><!--span class="small">Viewed at <br>'+row.time+'</span--></div></div>';
+                            return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah dikirim"><i class="fa-solid fa-check"></i><!--span class="small">Viewed at <br>'+row.time+'</span--></div></div>';
                         } else if (row.ack == 2) {
                             return '<div class="d-md-flex justify-content-md-center"><div class="text-center" data-bs-toggle="tooltip" data-bs-title="Pesan telah diterima"><i class="fa-solid fa-check-double"></i><!--span class="small">Viewed at <br>'+row.time+'</span--></div>';
                         } else if (row.ack == 3) {
