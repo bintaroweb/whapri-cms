@@ -106,7 +106,7 @@ class BillingController extends Controller
             'customer_details' => array(
                 'first_name' => Auth::user()->name,
                 'email' => Auth::user()->email,
-                'phone' => '08111222333',
+                // 'phone' => '08111222333',
             ),
         );
         

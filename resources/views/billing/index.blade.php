@@ -5,9 +5,15 @@
 <!-- Custom styles for this page -->
 <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+@if(env('MIDTRANS_PRODUCTION') == true)
+<script type="text/javascript"
+      src="https://app.midtrans.com/snap/v1/transactions"
+      data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+@else 
 <script type="text/javascript"
       src="https://app.sandbox.midtrans.com/snap/snap.js"
       data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+@endif
 
 @endsection
 
