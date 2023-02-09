@@ -26,7 +26,7 @@
                         </div>
                         <div class="form-group">
                             <label for="title" class="required">Nomor</label>
-                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name ="phone" value="{{ old('phone') }}" required>
+                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name ="phone" value="{{ old('phone') }}" onkeypress="return onlyNumberKey(event)" required>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -50,3 +50,39 @@
 </div>
 
 @endsection
+
+@push('scripts')
+
+<script>
+function onlyNumberKey(evt) {
+    // Only ASCII character in that range allowed
+    var ASCIICode = (evt.which) ? evt.which : evt.keyCode
+    if(ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)){
+        return false;
+    }
+    return true;
+}
+
+var phone = document.getElementById('phone'),
+    cleanPhoneNumber;
+
+cleanPhoneNumber= function(e) {
+    e.preventDefault();
+    var pastedText = '';
+
+    if (e.clipboardData && e.clipboardData.getData)
+    {// Standards Compliant FIRST!
+    pastedText = e.clipboardData.getData('text/plain');
+    }
+    else if (window.clipboardData && window.clipboardData.getData)
+    {// IE
+    pastedText = window.clipboardData.getData('Text');
+    }
+
+    this.value = pastedText.replace(/\D/g, '');
+}
+
+phone.onpaste = cleanPhoneNumber;
+</script>
+
+@endpush
