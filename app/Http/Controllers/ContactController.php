@@ -119,12 +119,17 @@ class ContactController extends Controller
 
                 $phone = str_replace(' ', '', $importData[0]);
                 $phone = str_replace('-', '', $phone);
-                Contact::create([
-                    "name" => $importData[1],
-                    "phone" => $phone,
-                    "source" => 'import',
-                    "user_id" => Auth::user()->id
-                ]);
+                $total = Contact::where('user_id', Auth::user()->id)->where('phone', $phone)->count();
+                // dd($total);
+                if($total == 0){
+                    Contact::create([
+                        "name" => $importData[1],
+                        "phone" => $phone,
+                        "source" => 'import',
+                        "user_id" => Auth::user()->id
+                    ]);
+                }
+                
             }
             // return response()->json([
             //     "message" => "$j records successfully uploaded",
