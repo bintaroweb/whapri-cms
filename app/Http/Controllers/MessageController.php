@@ -155,8 +155,9 @@ class MessageController extends Controller
 
         //Upload Image Cloudinary
         $img  = $request->file('img');
-        $file = Cloudinary::upload($img->getRealPath())->getSecurePath();
-        // $result = CloudinaryStorage::upload($img->getRealPath(), $img->getClientOriginalName());
+        if(!empty($img)){
+            $file = Cloudinary::upload($img->getRealPath())->getSecurePath();
+        }
 
         if(!empty($file)){
             Message::create([
