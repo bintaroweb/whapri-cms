@@ -12,74 +12,133 @@
 @section('content')
 
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mt-2">Kirim WhatsApp</h5>
+    <form method="post" action="{{ url('/messages') }}" id="send-message" enctype="multipart/form-data">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mt-2">Kirim WhatsApp</h5>
+                    </div>
+                    <div class="card-body">
+                            <input type="hidden" id="uuid" />
+                            <!-- <input type="hidden" name="ack" id="ack" /> -->
+                            <!-- <input type="hidden" name="message_id" id="messageId" /> -->
+                            <!-- <input type="hidden" name="timestamp" id="timestamp" /> -->
+                            @csrf
+                            <div class="form-group">
+                                <label for="title" class="required" name="message" required>Isi Pesan</label>
+                                <textarea class="form-control @error('message') is-invalid @enderror" name="message" id="message" rows="10">{{ old('message') }}</textarea>
+                                <!-- <button class="btn btn-secondary btn-sm my-2" id="selectTemplate"><i class="fa-solid fa-file-import"></i> Salin dari template</button> -->
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contact" class="required">Nomor Tujuan</label>
+                                <select name="receiver" id="receiver" class="form-control @error('receiver') is-invalid @enderror">
+                                </select>
+                                <!-- <input type="text" class="form-control @error('receiver') is-invalid @enderror" id="receiver" name ="receiver" value="{{ old('receiver') }}" onkeypress="return onlyNumberKey(event)" required> -->
+                                @error('contact')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="contact" class="required">Perangkat</label>
+                                <select name="device" id="device" class="form-control @error('device') is-invalid @enderror">
+                                    <option>-- Pilih --</option>    
+                                    @foreach ($devices as $device)
+                                            <option value="{{ $device-> uuid }}">{{ $device-> name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('contact')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                            </div>
+                            <!-- <div class="form-group">
+                                <a class="btn btn-outline-primary mr-2" href="{{ url('/messages') }}">Batal</a>
+                                <button class="btn btn-primary ms-2" id="simpan">Simpan</button>
+                            </div> -->
+                        <!-- </form> -->
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="post" action="{{ url('/messages') }}" id="send-message">
-                        <input type="hidden" id="uuid" />
-                        <!-- <input type="hidden" name="ack" id="ack" /> -->
-                        <!-- <input type="hidden" name="message_id" id="messageId" /> -->
-                        <!-- <input type="hidden" name="timestamp" id="timestamp" /> -->
-                        @csrf
-                        <div class="form-group">
-                            <label for="title" class="required" name="message" required>Isi Pesan</label>
-                            <textarea class="form-control @error('message') is-invalid @enderror" name="message" id="message" rows="10">{{ old('message') }}</textarea>
-                            <!-- <button class="btn btn-secondary btn-sm my-2" id="selectTemplate"><i class="fa-solid fa-file-import"></i> Salin dari template</button> -->
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Opsi</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8 fs-6"><strong>Salin dari template</strong></div>
+                            <div class="col-md-4 d-flex flex-row-reverse mb-3 ">
+                                <label class="switch">
+                                    <input type="checkbox" name="select_template" class="select-template" id="selectTemplate">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <!-- <div class="form-check mb-3 mx-3">
+                                <input class="form-check-input" type="checkbox" value="" id="selectTemplate">
+                                <label class="form-check-label" for="selectTemplate">
+                                    Salin dari template
+                                </label>
+                            </div> -->
+                            <div class="form-group d-none" id="formTemplate">
+                                <label for="contact">Pilih Template Pesan</label>
+                                <select name="template" id="template" class="form-control @error('template') is-invalid @enderror">
+                                    <option>-- Pilih --</option>
+                                    @foreach ($templates as $template)
+                                        <option value="{{ $template-> uuid }}">{{ $template-> name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('contact')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" value="" id="selectTemplate">
-                            <label class="form-check-label" for="selectTemplate">
-                                Salin dari template
-                            </label>
+
+                        <div class="row mt-2">
+                            <div class="col-md-8 fs-6"><strong>Upload gambar</strong></div>
+                            <div class="col-md-4 d-flex flex-row-reverse">
+                                <label class="switch">
+                                    <input type="checkbox" name="photo_upload" class="photo-upload" id="photoUpload">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="form-group d-none" id="uploadPhoto">
+                                <!-- <label for="img">Upload gambar</label> -->
+                                <input type="file" class="form-control @error('file') is-invalid @enderror" id="img" name ="img" onchange="loadFile(event)" accept="image/png, image/jpeg">
+                                @error('img')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+
+                                <img src="{{ asset('images/image.png') }}" id="preview" height="115px" class="mt-3"/>
+                            </div>
                         </div>
-                        <div class="form-group d-none" id="formTemplate">
-                            <label for="contact">Pilin Template Pesan</label>
-                            <select name="template" id="template" class="form-control @error('template') is-invalid @enderror">
-                                <option>-- Pilih --</option>
-                                @foreach ($templates as $template)
-                                    <option value="{{ $template-> uuid }}">{{ $template-> name }}</option>
-                                @endforeach
-                            </select>
-                            @error('contact')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+
+                        <!-- <div class="row mt-2">
+                            <div class="col-md-8 fs-6"><strong>Harga Per Tipe Pesanan</strong></div>
+                            <div class="col-md-4 d-flex flex-row-reverse">
+                                <label class="switch">
+                                    <input type="checkbox" name="is_sales_type_price" class="switch-sales-type">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div> -->
+
+                        <div class="row mt-5">
+                            <div class="col-md-12 d-flex flex-row-reverse">
+                                <div class="form-group">
+                                    <a class="btn btn-outline-primary mr-2" href="{{ url('/messages') }}">Batal</a>
+                                    <button class="btn btn-primary ms-2" id="simpan">Simpan</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="contact" class="required">Nomor Tujuan</label>
-                            <select name="receiver" id="receiver" class="form-control @error('receiver') is-invalid @enderror">
-                            </select>
-                            <!-- <input type="text" class="form-control @error('receiver') is-invalid @enderror" id="receiver" name ="receiver" value="{{ old('receiver') }}" onkeypress="return onlyNumberKey(event)" required> -->
-                            @error('contact')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="contact" class="required">Perangkat</label>
-                            <select name="device" id="device" class="form-control @error('device') is-invalid @enderror">
-                                @foreach ($devices as $device)
-                                    <option value="{{ $device-> uuid }}">{{ $device-> name }}</option>
-                                @endforeach
-                            </select>
-                            @error('contact')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <a class="btn btn-outline-primary mr-2" href="{{ url('/messages') }}">Batal</a>
-                            <button class="btn btn-primary ms-2" id="simpan">Simpan</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
 
 <!-- Modal Tambah -->
@@ -176,7 +235,6 @@
    });
 
     $('#device').change(function() {
-        // console.log('Device diubah')
         var uuid = $(this).val();
         $('#uuid').val(uuid);
     })
@@ -221,6 +279,19 @@
             $('#formTemplate').addClass('d-none'); 
         }
     })
+
+    $('#photoUpload').click(function(){
+        if($(this).prop("checked") == true){
+            $('#uploadPhoto').removeClass('d-none');        }
+        else if($(this).prop("checked") == false){
+            $('#uploadPhoto').addClass('d-none'); 
+        }
+    })
+
+    const loadFile = function(event) {
+        var image = document.getElementById('preview');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    };
 
     $('#template').change(function(){
         var uuid = $(this).val();

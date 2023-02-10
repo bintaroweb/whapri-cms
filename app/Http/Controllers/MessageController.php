@@ -7,6 +7,7 @@ use App\Models\Device;
 use App\Models\Message;
 use App\Models\Template;
 use App\Models\User;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DataTables;
@@ -144,23 +145,42 @@ class MessageController extends Controller
             // 'timestamp' => 'required'
         ]);
 
+        // dd($request);
+
         $device = Device::where('uuid', $request['device'])->first();
 
         $contact = Contact::where('phone', $request['receiver'])
                             ->where('user_id', Auth::user()->id)
                             ->first();
 
-        Message::create([
-            'message' => $request['message'],
-            // 'message_id' => $request['message_id'],
-            'contact_id' => $contact->id,
-            'device_id' => $device->id,
-            'user_id' => Auth::user()->id,
-            'ack' => 0,
-            // 'timestamp' => $request['timestamp'],
-            'date' => date("Y-m-d"),
-            'type' => 'single',
-        ]);
+        //Upload Image Cloudinary
+        $img  = $request->file('img');
+        $file = Cloudinary::upload($img->getRealPath())->getSecurePath();
+        // $result = CloudinaryStorage::upload($img->getRealPath(), $img->getClientOriginalName());
+
+        if(!empty($file)){
+            Message::create([
+                'message' => $request['message'],
+                'contact_id' => $contact->id,
+                'device_id' => $device->id,
+                'user_id' => Auth::user()->id,
+                'ack' => 0,
+                'file' => $file,
+                'date' => date("Y-m-d"),
+                'type' => 'single',
+            ]);
+        } else {
+            Message::create([
+                'message' => $request['message'],
+                'contact_id' => $contact->id,
+                'device_id' => $device->id,
+                'user_id' => Auth::user()->id,
+                'ack' => 0,
+                'date' => date("Y-m-d"),
+                'type' => 'single',
+            ]);
+        }
+        
 
         return redirect('/messages')->with('success', 'Pesan berhasil ditambah');
     }

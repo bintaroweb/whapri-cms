@@ -30,6 +30,7 @@ class Message extends Model
         'timestamp',
         'group_id',
         'type',
-        'date'
+        'date',
+        'file'
     ];
 }

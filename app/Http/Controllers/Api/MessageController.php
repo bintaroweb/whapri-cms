@@ -87,6 +87,7 @@ class MessageController extends Controller
                     'message' => $message->message,
                     'device' => $device->uuid,
                     'receiver' => $contact->phone,
+                    'file' => $message->file
                 ];
                 array_push($response, $data);
             }

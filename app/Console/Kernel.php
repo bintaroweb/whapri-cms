@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\BroadcastCron::class,
+        // \App\Console\Commands\BroadcastCron::class,
+        \App\Console\Commands\MessageCron::class,
     ];
 
 
@@ -26,8 +27,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('broadcast:cron')
-            ->everyTwoMinutes();
+        // $schedule->command('broadcast:cron')
+        //     ->everyTwoMinutes();
+        $schedule->command('message:cron')
+            ->everyMinute();
     }
 
     /**
