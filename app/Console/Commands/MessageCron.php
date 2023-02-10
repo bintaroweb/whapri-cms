@@ -53,7 +53,7 @@ class MessageCron extends Command
                         'message' => $message->message,
                         'device' => $device->uuid,
                         'receiver' => $contact->phone,
-                        'file' => ''
+                        'file' => 'No'
                     ]);
                 }
 
