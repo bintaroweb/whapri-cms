@@ -37,14 +37,27 @@ class MessageCron extends Command
             foreach($messages as $message){
                 $device = Device::find($message->device_id);
                 $contact = Contact::find($message->contact_id);
+                $file = $message->file;
 
-                $response = Http::timeout(240)->asForm()->post(env('MESSAGE_URL'), [
-                    'uuid' => $message->uuid,
-                    'message' => $message->message,
-                    'device' => $device->uuid,
-                    'receiver' => $contact->phone,
-                    'file' => $message->file
-                ]);
+                if($file !== null || $file !== ''){
+                    $response = Http::timeout(240)->asForm()->post(env('MESSAGE_URL'), [
+                        'uuid' => $message->uuid,
+                        'message' => $message->message,
+                        'device' => $device->uuid,
+                        'receiver' => $contact->phone,
+                        'file' => $message->file
+                    ]);
+                } else {
+                    $response = Http::timeout(240)->asForm()->post(env('MESSAGE_URL'), [
+                        'uuid' => $message->uuid,
+                        'message' => $message->message,
+                        'device' => $device->uuid,
+                        'receiver' => $contact->phone,
+                        'file' => ''
+                    ]);
+                }
+
+                
 
                 $result = json_decode($response->getBody());
                 Message::where('uuid', $message->uuid)
