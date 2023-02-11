@@ -87,35 +87,41 @@ class BillingController extends Controller
             'uuid'   => 'required|string'     
         ]);
 
+        // Billing::where('uuid', $request->uuid)->first();
+
         $billing = Billing::where('uuid', $request->uuid)->first();
-
-        // Set your Merchant Server Key
-        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
-        \Midtrans\Config::$isProduction = env('MIDTRANS_PRODUCTION');
-        // Set sanitization on (default)
-        \Midtrans\Config::$isSanitized = true;
-        // Set 3DS transaction for credit card to true
-        \Midtrans\Config::$is3ds = true;
-        
-        $params = array(
-            'transaction_details' => array(
-                'order_id' => $request->uuid,
-                'gross_amount' => $billing->amount,
-            ),
-            'customer_details' => array(
-                'first_name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-                // 'phone' => '08111222333',
-            ),
-        );
-        
-        $snapToken = \Midtrans\Snap::getSnapToken($params);
-
         return response()->json([
             'success' => true,
-            'token' => $snapToken
+            'billing' => $billing
         ]);  
+
+        // // Set your Merchant Server Key
+        // \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        // // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+        // \Midtrans\Config::$isProduction = env('MIDTRANS_PRODUCTION');
+        // // Set sanitization on (default)
+        // \Midtrans\Config::$isSanitized = true;
+        // // Set 3DS transaction for credit card to true
+        // \Midtrans\Config::$is3ds = true;
+        
+        // $params = array(
+        //     'transaction_details' => array(
+        //         'order_id' => $request->uuid,
+        //         'gross_amount' => $billing->amount,
+        //     ),
+        //     'customer_details' => array(
+        //         'first_name' => Auth::user()->name,
+        //         'email' => Auth::user()->email,
+        //         // 'phone' => '08111222333',
+        //     ),
+        // );
+        
+        // $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+        // return response()->json([
+        //     'success' => true,
+        //     'token' => $snapToken
+        // ]);  
     }
 
     /**
@@ -204,25 +210,28 @@ class BillingController extends Controller
         //
     }
 
-    public function ipaymu()
+    public function ipaymu(Request $request)
     {
-        // SAMPLE HIT API iPaymu v2 PHP // 
+        $billing = Billing::where('uuid', $request->uuid)->first();
 
+        // dd($billing->package);
+
+        // SAMPLE HIT API iPaymu v2 PHP // 
         $va           = '1179005216876545'; //get on iPaymu dashboard
         $apiKey       = 'tHzgMnwWmMvxG6rPyt1Y76OgwxJv2.'; //get on iPaymu dashboard
 
-        $url          = 'https://sandbox.ipaymu.com/api/v2/payment'; // for development mode
+        // $url          = 'https://sandbox.ipaymu.com/api/v2/payment'; // for development mode
 
-        // dd($va);
-
-        // $url          = 'https://my.ipaymu.com/api/v2/payment'; // for production mode
+        $url          = 'https://my.ipaymu.com/api/v2/payment'; // for production mode
         
         $method       = 'POST'; //method
         
+        $package = 'Paket ' . ucfirst($billing->package);
+        
         //Request Body//
-        $body['product']    = array('headset', 'softcase');
-        $body['qty']        = array('1', '3');
-        $body['price']      = array('100000', '20000');
+        $body['product']    = array($package);
+        $body['qty']        = array('1');
+        $body['price']      = array($billing->amount);
         $body['returnUrl']  = 'https://your-website.com/thank-you-page';
         $body['cancelUrl']  = 'https://your-website.com/cancel-page';
         $body['notifyUrl']  = 'https://your-website.com/callback-url';
@@ -271,12 +280,12 @@ class BillingController extends Controller
             if($ret->Status == 200) {
                 $sessionId  = $ret->Data->SessionID;
                 $url        =  $ret->Data->Url;
-                dd($url);
-                header('Location:' . $url);
-            } else {
-                echo $ret;
+                // dd($url);
+                return response()->json([
+                    'success' => true,
+                    'url' => $url
+                ]); 
             }
-            //End Response
         }
     }
 

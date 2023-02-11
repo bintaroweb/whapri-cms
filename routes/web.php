@@ -54,7 +54,7 @@ Route::get('billings/datatable', [\App\Http\Controllers\BillingController::class
 Route::get('billings/datatable_transaction', [\App\Http\Controllers\BillingController::class, 'datatable_transaction']);
 Route::get('billings/autocomplete', [\App\Http\Controllers\BillingController::class, 'autocomplete']);
 Route::post('billings/payment', [\App\Http\Controllers\BillingController::class, 'payment']);
-Route::get('billings/ipaymu', [\App\Http\Controllers\BillingController::class, 'ipaymu']);
+Route::post('billings/ipaymu', [\App\Http\Controllers\BillingController::class, 'ipaymu']);
 Route::get('billings/detail', [\App\Http\Controllers\BillingController::class, 'detail']);
 Route::get('billings/transaction', [\App\Http\Controllers\BillingController::class, 'transaction']);
 Route::resource('billings', '\App\Http\Controllers\BillingController');

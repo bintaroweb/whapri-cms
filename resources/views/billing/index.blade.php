@@ -5,7 +5,7 @@
 <!-- Custom styles for this page -->
 <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-@if(env('MIDTRANS_PRODUCTION') == true)
+<!-- @if(env('MIDTRANS_PRODUCTION') == true)
 <script type="text/javascript"
       src="https://app.midtrans.com/snap/snap.js"
       data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
@@ -13,7 +13,7 @@
 <script type="text/javascript"
       src="https://app.sandbox.midtrans.com/snap/snap.js"
       data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
-@endif
+@endif -->
 
 @endsection
 
@@ -252,18 +252,37 @@
             var uuid = $(this).data('uuid');
             $.ajax({
                 type: 'POST',
-                url: "{{ url('/billings/payment') }}",
+                url: "{{ url('/billings/ipaymu') }}",
                 data: {
                     uuid: uuid,
                     _token: '{{csrf_token()}}'
                 },
                 success: function(result) { 
                     if(result.success){
-                        window.snap.pay(result.token);
+                        // console.log(result);
+                        window.open(result.url);
                     }
                 }
             })
         })
+
+        // $( document ).on("click", ".pay", function(e){
+        //     e.preventDefault();
+        //     var uuid = $(this).data('uuid');
+        //     $.ajax({
+        //         type: 'POST',
+        //         url: "{{ url('/billings/payment') }}",
+        //         data: {
+        //             uuid: uuid,
+        //             _token: '{{csrf_token()}}'
+        //         },
+        //         success: function(result) { 
+        //             if(result.success){
+        //                 window.snap.pay(result.token);
+        //             }
+        //         }
+        //     })
+        // })
 
         $( document ).on("click", ".detail", function(e){
             e.preventDefault();
