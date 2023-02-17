@@ -26,3 +26,4 @@ Route::post('device/status', [DeviceController::class, 'status']);
 Route::post('message/status', [MessageController::class, 'status']);
 Route::get('message/blast', [MessageController::class, 'blast']);
 Route::get('message/send', [MessageController::class, 'send']);
+Route::post('message/contact', [MessageController::class, 'contact']);

@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\Device;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 
@@ -103,5 +104,27 @@ class MessageController extends Controller
         }
 
         
+    }
+
+    public function contact(Request $request) 
+    {
+        $request->validate([
+            'id' => 'required',
+            'phone' => 'required'
+        ]);
+
+        $device = Device::where('uuid', $request->id)->first();
+        $contact = Contact::where('user_id', $device->user_id)->where('phone', $request->phone)->count();
+        if($contact === 0){
+            $contact = Contact::create([
+                'phone' => $request->phone,
+                'user_id' => $device->user_id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Contact berhasil disimpan'
+            ]); 
+        }        
     }
 }
