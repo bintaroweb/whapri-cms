@@ -115,7 +115,7 @@ class MessageController extends Controller
 
         $device = Device::where('uuid', $request->id)->first();
         $contact = Contact::where('user_id', $device->user_id)->where('phone', $request->phone)->count();
-        if($contact === 0){
+        if($contact == 0){
             $contact = Contact::create([
                 'phone' => $request->phone,
                 'user_id' => $device->user_id,
