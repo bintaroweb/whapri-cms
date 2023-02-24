@@ -54,23 +54,36 @@ class ContactController extends Controller
             'phone' => 'required|string'          
         ]);
 
-        $contact = Contact::create([
-            'name' => $request['name'],
-            'phone' => $request['phone'],
-            'label' => $request['label'],
-            'user_id' => Auth::user()->id,
-        ]);
+        $contact = Contact::where('user_id', Auth::user()->id)->where('phone', $request->phone)->count();
 
-        $contactId = $contact->id;
-
-        if($request->ajax()){
-            return response()->json([
-                'success' => true,
-                'id' => $contactId
+        if($contact == 0){
+            $contact = Contact::create([
+                'name' => $request['name'],
+                'phone' => $request['phone'],
+                'label' => $request['label'],
+                'user_id' => Auth::user()->id,
             ]);
-        }         
 
-        return redirect('/contacts')->with('success', 'Kontak berhasil ditambah');
+            $contactId = $contact->id;
+
+            if($request->ajax()){
+                return response()->json([
+                    'success' => true,
+                    'id' => $contactId
+                ]);
+            }         
+
+            return redirect('/contacts')->with('success', 'Kontak berhasil ditambah');
+            
+        } else {
+            if($request->ajax()){
+                return response()->json([
+                    'success' => false
+                ]);
+            }         
+
+            return redirect('/contacts')->with('error', 'Kontak sudah ada');
+        }
     }
 
     public function import(Request $request)
