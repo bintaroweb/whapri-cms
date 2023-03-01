@@ -125,6 +125,11 @@ class MessageController extends Controller
                 'success' => true,
                 'message' => 'Contact berhasil disimpan'
             ]); 
-        }        
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Contact suda ada'
+            ]); 
+        }       
     }
 }

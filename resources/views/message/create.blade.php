@@ -42,6 +42,11 @@
                                 @error('contact')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+
+                                <label class="switch">
+                                    <input type="checkbox" name="sent" class="select-template" id="sent">
+                                    <span class="slider round"></span>
+                                </label>
                             </div>
                             <div class="form-group">
                                 <label for="contact" class="required">Perangkat</label>
@@ -191,12 +196,18 @@
 
     //Select2
     var path = "{{ url('/messages/autocomplete') }}";
-    // $('#receiver').select2({theme: 'bootstrap-5'});
+    var sent =  $('#sent').val();
+
+    console.log(sent);
+
     $('#receiver').select2({
         theme: 'bootstrap-5',
         placeholder: 'Pilih kontak',
         ajax: {
           url: path,
+          data: {
+            sent : sent
+          },
           dataType: 'json',
           delay: 50,
           processResults: function (data) {

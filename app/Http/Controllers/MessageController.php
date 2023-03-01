@@ -101,7 +101,9 @@ class MessageController extends Controller
      */
     public function autocomplete(Request $request)
     {
+        $sent = $request->sent;
         $contacts = Contact::where('user_id', Auth::user()->id)->get();
+
         return response()->json($contacts);
     }
 
