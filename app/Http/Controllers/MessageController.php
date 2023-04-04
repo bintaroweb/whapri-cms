@@ -102,14 +102,14 @@ class MessageController extends Controller
     public function autocomplete(Request $request)
     {
         $data = [];
-        $contacts = Contact::where('user_id', Auth::user()->id)->get();
-        foreach($contacts as $contact){
-            $message = Message::where('contact_id', $contact->id)->where('user_id', Auth::user()->id)->count();
-            dd($message);
-            // if($message == 0){
-            //     array_push($data, $contact);
-            // }
-        }
+        // $contacts = Contact::where('user_id', Auth::user()->id)->get();
+        // foreach($contacts as $contact){
+        //     $message = Message::where('contact_id', $contact->id)->where('user_id', Auth::user()->id)->count();
+        //     dd($message);
+        //     // if($message == 0){
+        //     //     array_push($data, $contact);
+        //     // }
+        // }
 
         return response()->json($data);
     }
