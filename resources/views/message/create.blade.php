@@ -194,25 +194,27 @@
         $('#device').change();       
     })
 
-    //Select2
     var path = "{{ url('/messages/autocomplete') }}";
-    var sent =  $('#sent').val();
 
-    console.log(sent);
+    //Select2
+    // $('#selectTemplate').click(function(){
+    //     if($('#sent').prop("checked") === true){
+    //         path = "{{ url('/messages/contacts') }}";
+    //     } else {
+    //         path = "{{ url('/messages/autocomplete') }}";
+    //     }
+    // })
 
     $('#receiver').select2({
         theme: 'bootstrap-5',
         placeholder: 'Pilih kontak',
         ajax: {
-          url: path,
-          data: {
-            sent : sent
-          },
-          dataType: 'json',
-          delay: 50,
-          processResults: function (data) {
+        url: path,
+        dataType: 'json',
+        delay: 50,
+        processResults: function (data) {
             return {
-              results:  $.map(data, function (item) {
+            results:  $.map(data, function (item) {
                 if(item.name === null){
                     return {
                         text: item.phone,
@@ -224,13 +226,13 @@
                         id: item.phone
                     }
                 }
-              })
+            })
             };
-          },
-          escapeMarkup: function (markup) {
+        },
+        escapeMarkup: function (markup) {
             return markup;
-          },
-          cache: true
+        },
+        cache: true
         }
     })
     .on('select2:open', function () {
@@ -243,7 +245,7 @@
                             $('#modal-tambah').modal('show');
                         });
         }
-   });
+    });
 
     $('#device').change(function() {
         var uuid = $(this).val();

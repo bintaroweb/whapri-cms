@@ -128,7 +128,7 @@ class MessageController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Contact suda ada'
+                'message' => 'Contact sudah ada'
             ]); 
         }       
     }

@@ -33,6 +33,7 @@ Route::post('contacts/import', [\App\Http\Controllers\ContactController::class, 
 Route::resource('contacts', '\App\Http\Controllers\ContactController');
 //Message
 Route::get('messages/autocomplete', [\App\Http\Controllers\MessageController::class, 'autocomplete']);
+Route::get('messages/contacts', [\App\Http\Controllers\MessageController::class, 'contacts']);
 Route::get('messages/datatable', [\App\Http\Controllers\MessageController::class, 'datatable']);
 Route::get('messages/detail', [\App\Http\Controllers\MessageController::class, 'detail']);
 Route::get('messages/template', [\App\Http\Controllers\MessageController::class, 'template']);

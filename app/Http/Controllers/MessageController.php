@@ -101,10 +101,39 @@ class MessageController extends Controller
      */
     public function autocomplete(Request $request)
     {
-        $sent = $request->sent;
+        $data = [];
         $contacts = Contact::where('user_id', Auth::user()->id)->get();
+        foreach($contacts as $contact){
+            $message = Message::where('contact_id', $contact->id)->where('user_id', Auth::user()->id)->count();
+            if($message == 0){
+                array_push($data, $contact);
+            }
+        }
 
-        return response()->json($contacts);
+        return response()->json($data);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function contacts(Request $request)
+    {
+        $contacts = Contact::where('user_id', Auth::user()->id)->get();
+        // dd($contacts);
+        $data = [];
+
+        foreach($contacts as $contact => $c){
+            $contact = Message::where('user_id', Auth::user()->id)->where('contact_id', $c->id)->count();
+            if($contact == 0){
+                array_push($data, $c);
+            }
+        }
+
+        // dd($data);
+
+        return response()->json($data);
     }
 
     /**
@@ -147,8 +176,6 @@ class MessageController extends Controller
             // 'timestamp' => 'required'
         ]);
 
-        // dd($request);
-
         $device = Device::where('uuid', $request['device'])->first();
 
         $contact = Contact::where('phone', $request['receiver'])
@@ -183,7 +210,6 @@ class MessageController extends Controller
                 'type' => 'single',
             ]);
         }
-        
 
         return redirect('/messages')->with('success', 'Pesan berhasil ditambah');
     }
