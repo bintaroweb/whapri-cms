@@ -105,9 +105,10 @@ class MessageController extends Controller
         $contacts = Contact::where('user_id', Auth::user()->id)->get();
         foreach($contacts as $contact){
             $message = Message::where('contact_id', $contact->id)->where('user_id', Auth::user()->id)->count();
-            if($message == 0){
-                array_push($data, $contact);
-            }
+            dd($message);
+            // if($message == 0){
+            //     array_push($data, $contact);
+            // }
         }
 
         return response()->json($data);
